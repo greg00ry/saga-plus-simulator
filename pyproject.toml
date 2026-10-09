@@ -1,0 +1,17 @@
+[project]
+name = "saga-plus-simulator"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "greg00ry", email = "grzegorz.trzaskoma21@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+saga-plus-simulator = "saga_plus_simulator:main"
+
+[build-system]
+requires = ["uv_build>=0.12.24,<0.13.0"]
+build-backend = "uv_build"
