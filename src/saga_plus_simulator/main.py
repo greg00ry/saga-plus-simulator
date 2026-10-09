@@ -1,26 +1,14 @@
-from fastapi import FastAPI, Depends, HTTPException
-from pydantic import BaseModel
+from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
 from saga_plus_simulator.database import get_db
 from saga_plus_simulator.models import Reservation
-from saga_plus_simulator.schemas import ReservationOut, ReservationCreate
-
-
+from saga_plus_simulator.schemas import ReservationCreate, ReservationOut
 
 app = FastAPI()
 
-class Item(BaseModel):
-    name: str
-    quantity: int
-
-@app.post("/items")
-def create_item(item: Item):
-    return {"received": item.name, "quantity": item.quantity}
-
-
 @app.post("/reservations", response_model=ReservationOut)
-def create_reservation(payload: ReservationCreate, db: Session = Depends(get_db)):
+def create_reservation(payload: ReservationCreate, db: Session = Depends(get_db)) -> Reservation:
     reservation = Reservation(
         order_id=payload.order_id,
         product_id=payload.product_id,
@@ -31,8 +19,9 @@ def create_reservation(payload: ReservationCreate, db: Session = Depends(get_db)
     db.refresh(reservation)
     return reservation
 
+
 @app.post("/reservations/{reservation_id}/release", response_model=ReservationOut)
-def release_reservation(reservation_id: int, db: Session = Depends(get_db)):
+def release_reservation(reservation_id: int, db: Session = Depends(get_db)) -> Reservation:
     reservation = db.get(Reservation, reservation_id)
 
     if reservation is None:

@@ -1,11 +1,13 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
+
 from .database import Base
+
 
 class Reservation(Base):
     __tablename__ = "reservations"
 
-    id = Column(Integer, primary_key=True, index=True)
-    order_id = Column(String, nullable=False)
-    product_id = Column(String, nullable=False)
-    quantity = Column(Integer, nullable=False)
-    status = Column(String, nullable=False, default="reserved")
+    order_id: Mapped[int]
+    product_id: Mapped[int]
+    quantity: Mapped[int]
+    id: Mapped[int] = mapped_column(primary_key=True, index=True, init=False)
+    status: Mapped[str] = mapped_column(default="reserved")
