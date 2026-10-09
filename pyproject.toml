@@ -31,3 +31,14 @@ dev = [
     "pytest-asyncio>=1.4.0",
     "ruff>=0.16.10",
 ]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E","F", "I", "UP", "B"]
+
+[tool.mypy]
+python.version = "3.12"
+strict = true
