@@ -9,6 +9,7 @@ from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass, Session, sessionm
 class Base(DeclarativeBase, MappedAsDataclass):
     pass
 
+
 load_dotenv()
 
 DATABASE_URL = os.environ["DATABASE_URL"]
