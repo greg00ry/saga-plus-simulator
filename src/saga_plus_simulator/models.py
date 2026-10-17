@@ -52,7 +52,7 @@ class Shipment(Base):
 class ProcessedRequests(Base):
     __tablename__ = "processed_requests"
     idempotency_key: Mapped[str] = mapped_column(primary_key=True)
-    endpoint: Mapped[int]
+    endpoint: Mapped[str]
     response_body: Mapped[dict[str, Any]] = mapped_column(JSON)
-    response_status: Mapped[str]
+    response_status: Mapped[int]
     created_at: Mapped[datetime] = mapped_column(default=datetime.now)
