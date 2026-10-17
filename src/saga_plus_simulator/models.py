@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy import JSON
 from sqlalchemy.orm import Mapped, mapped_column
@@ -52,6 +53,6 @@ class ProcessedRequests(Base):
     __tablename__ = "processed_requests"
     idempotency_key: Mapped[str] = mapped_column(primary_key=True)
     endpoint: Mapped[int]
-    response_body: Mapped[dict] = mapped_column(JSON)
+    response_body: Mapped[dict[str, Any]] = mapped_column(JSON)
     response_status: Mapped[str]
     created_at: Mapped[datetime] = mapped_column(default=datetime.now)

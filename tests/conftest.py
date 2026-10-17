@@ -1,5 +1,12 @@
 import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from testcontainers.postgres import PostgresContainer
+
+from saga_plus_simulator import models
+from saga_plus_simulator.database import Base, get_db
+from saga_plus_simulator.main import app
 
 
 @pytest.fixture(scope="session")
@@ -8,10 +15,7 @@ def postgres_container():
         yield container
 
 
-from sqlalchemy import create_engine
 
-from saga_plus_simulator import models
-from saga_plus_simulator.database import Base, get_db
 
 
 @pytest.fixture(scope="session")
@@ -21,10 +25,7 @@ def engine(postgres_container):
     Base.metadata.create_all(engine)
     yield engine
 
-from fastapi.testclient import TestClient
-from sqlalchemy.orm import sessionmaker
 
-from saga_plus_simulator.main import app
 
 
 @pytest.fixture
