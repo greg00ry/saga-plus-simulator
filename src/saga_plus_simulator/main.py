@@ -65,6 +65,19 @@ def create_payment(reservation_id: int, db: Session = Depends(get_db)) -> Paymen
 
     return payment
 
+@app.post("/payments/{payment_id}/refund", response_model=PaymentOut)
+def refund(paymanent_id: int, db: Session = Depends(get_db)) -> Payment:
+    payment = db.get(Payment, paymanent_id)
+    if payment is None:
+        raise HTTPException(status_code=404, detail="Payment not found")
+
+    payment.status = "refund"
+
+    db.commit()
+    db.refresh(payment)
+
+    return payment
+
 
 @app.post("/shipping/{payment_id}/ship", response_model=ShipmentOut)
 def create_shipping(payment_id: int, db: Session = Depends(get_db)) -> Shipment:
@@ -80,6 +93,19 @@ def create_shipping(payment_id: int, db: Session = Depends(get_db)) -> Shipment:
     )
 
     db.add(shipment)
+    db.commit()
+    db.refresh(shipment)
+
+    return shipment
+
+@app.post("/shipping/{shipment_id}/cancel", response_model=PaymentOut)
+def refund(shipment_id: int, db: Session = Depends(get_db)) -> Shipment:
+    shipment = db.get(Shipment, shipment_id)
+    if shipment is None:
+        raise HTTPException(status_code=404, detail="Payment not found")
+
+    shipment.status = "cancelled"
+
     db.commit()
     db.refresh(shipment)
 
