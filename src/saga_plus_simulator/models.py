@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from sqlalchemy import JSON
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import Base
@@ -43,3 +46,12 @@ class Shipment(Base):
     order_id: Mapped[int]
     id: Mapped[int] = mapped_column(primary_key=True, index=True, init=False)
     status: Mapped[str] = mapped_column(default="package picked up")
+
+
+class ProcessedRequests(Base):
+    __tablename__ = "processed_requests"
+    idempotency_key: Mapped[str] = mapped_column(primary_key=True)
+    endpoint: Mapped[int]
+    response_body: Mapped[dict] = mapped_column(JSON)
+    response_status: Mapped[str]
+    created_at: Mapped[datetime] = mapped_column(default=datetime.now)
