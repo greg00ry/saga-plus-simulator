@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+from sqlalchemy import text
 
 from saga_plus_simulator.main import app
 
@@ -19,3 +20,8 @@ def test_full_saga_happy_path(client, sample_product, sample_order) -> None:
     assert shipment.status_code == 200
     assert shipment.json()["status"] == "package picked up"
     return
+
+def test_no_leftover_data_after_saga(engine):
+    with engine.connect() as conn:
+        count = conn.execute(text("SELECT count(*) FROM products")).scalar()
+        assert count == 0

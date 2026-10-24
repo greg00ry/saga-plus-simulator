@@ -1,8 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
-from testcontainers.postgres import PostgresContainer
+from testcontainers.community.postgres import PostgresContainer
 
 from saga_plus_simulator import models
 from saga_plus_simulator.database import Base, get_db
@@ -27,14 +27,27 @@ def engine(postgres_container):
 
 
 
-
 @pytest.fixture
 def db_session(engine):
-    Session = sessionmaker(bind=engine)
+    connection = engine.connect()
+    transaction = connection.begin()
+    Session = sessionmaker(bind=connection)
     session = Session()
+    nested = connection.begin_nested()
+
+    @event.listens_for(session, "after_transaction_end")
+    def restart_savepoint(sess, trans):
+        nonlocal nested
+        if not nested.is_active:
+            nested = connection.begin_nested()
+
+
     yield session
-    session.rollback()
+
     session.close()
+    transaction.rollback()
+    connection.close()
+
 
 @pytest.fixture
 def client(db_session):

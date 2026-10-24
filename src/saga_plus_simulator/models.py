@@ -55,4 +55,4 @@ class ProcessedRequests(Base):
     endpoint: Mapped[str]
     response_body: Mapped[dict[str, Any]] = mapped_column(JSON)
     response_status: Mapped[int]
-    created_at: Mapped[datetime] = mapped_column(default=datetime.now)
+    created_at: Mapped[datetime] = mapped_column(default_factory=datetime.now)

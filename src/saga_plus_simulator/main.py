@@ -12,7 +12,9 @@ app = FastAPI()
 
 
 @app.post("/reservations", response_model=ReservationOut)
-def create_reservation(payload: ReservationCreate, db: Session = Depends(get_db)) -> Reservation | dict[str, Any]:
+def create_reservation(
+        payload: ReservationCreate, db: Session = Depends(get_db)
+                       ) -> Reservation | dict[str, Any]:
 
     cached = get_cached_response(str(payload.order_id), "create_reservation", db)
     if cached is not None:
@@ -40,7 +42,9 @@ def create_reservation(payload: ReservationCreate, db: Session = Depends(get_db)
 
 
 @app.post("/reservations/{reservation_id}/release", response_model=ReservationOut)
-def release_reservation(reservation_id: int, db: Session = Depends(get_db)) -> Reservation | dict[str, Any]:
+def release_reservation(
+        reservation_id: int, db: Session = Depends(get_db)
+                        ) -> Reservation | dict[str, Any]:
 
     cached = get_cached_response(str(reservation_id), "release_reservation", db)
     if cached is not None:

@@ -1,9 +1,9 @@
 
 from typing import Any
 
-from saga_plus_simulator.models import ProcessedRequests
 from sqlalchemy.orm import Session
 
+from saga_plus_simulator.models import ProcessedRequests
 
 
 def create_idempotency_key(object_id: str, method: str) -> str:
