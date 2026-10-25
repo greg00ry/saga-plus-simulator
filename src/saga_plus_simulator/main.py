@@ -1,17 +1,23 @@
 from typing import Any
 
-from fastapi import Depends, FastAPI, HTTPException, Header
+from fastapi import Depends, FastAPI, Header, HTTPException
 from sqlalchemy.orm import Session
 
 from saga_plus_simulator.database import get_db
 from saga_plus_simulator.generate_idempotency_key import get_cached_response, save_response
 from saga_plus_simulator.models import Order, Payment, Product, Reservation, Shipment
-from saga_plus_simulator.schemas import PaymentOut, ReservationCreate, ReservationOut, ShipmentOut, OrderCreate, \
-    OrderOut
+from saga_plus_simulator.schemas import (
+    OrderCreate,
+    OrderOut,
+    PaymentOut,
+    ReservationCreate,
+    ReservationOut,
+    ShipmentOut,
+)
 
 app = FastAPI()
 
-@app.post("/orders")
+@app.post("/orders", response_model=OrderOut)
 def create_order(
         payload: OrderCreate,
         idempotency_key: str = Header(),
