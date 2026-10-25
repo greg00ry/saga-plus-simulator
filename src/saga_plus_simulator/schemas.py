@@ -35,3 +35,17 @@ class ShipmentOut(BaseModel):
     status: str
 
     model_config = {"from_attributes": True}
+
+class OrderCreate(BaseModel):
+    product_id: int
+    quantity: int
+    status: str
+
+    model_config = {"from_attributes": True}
+
+class OrderOut(BaseModel):
+    id: int
+    order_id: int
+    status: str
+    quantity: int
+    model_config = {"from_attributes": True}

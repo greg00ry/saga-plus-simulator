@@ -21,6 +21,7 @@ class Order(Base):
     product_id: Mapped[int]
     quantity: Mapped[int]
     id: Mapped[int] = mapped_column(primary_key=True, index=True, init=False)
+    status: Mapped[str] = mapped_column(default="created")
 
 
 class Reservation(Base):
