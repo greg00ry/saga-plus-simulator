@@ -45,7 +45,7 @@ class OrderCreate(BaseModel):
 
 class OrderOut(BaseModel):
     id: int
-    order_id: int
     status: str
+    product_id: int
     quantity: int
     model_config = {"from_attributes": True}
