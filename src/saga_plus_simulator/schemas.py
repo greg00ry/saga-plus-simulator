@@ -39,7 +39,6 @@ class ShipmentOut(BaseModel):
 class OrderCreate(BaseModel):
     product_id: int
     quantity: int
-    status: str
 
     model_config = {"from_attributes": True}
 

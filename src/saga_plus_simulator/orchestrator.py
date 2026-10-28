@@ -5,14 +5,19 @@ from typing import Any, cast
 import httpx2
 
 
+
+
+
 async def run_saga() -> None:
 
     await orchestrator(
         generate_idempotency_key(),
-        random.randint(1, 100),
-        random.randint(1, 100)
+        random.randint(101, 200),
+        random.randint(101, 200)
     )
     return
+
+
 
 def generate_idempotency_key() -> str:
     return str(uuid.uuid4())
@@ -44,3 +49,8 @@ async def orchestrator(
         shipment_data = shipment.json()
 #rozwiązanie problemu zwrócenia Any w mypy, cast wymusza typowanie
         return cast(dict[str, Any], shipment_data)
+
+if __name__ == "__main__":
+    import asyncio
+
+    asyncio.run(run_saga())
