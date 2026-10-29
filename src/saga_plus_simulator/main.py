@@ -306,6 +306,9 @@ def cancel_shipment(
         idempotency_key: str = Header()
 ) -> Shipment | dict[str, Any]:
 
+    inject_delay()
+    inject_connection_loss("cancel_shipment")
+
     cached = get_cached_response(idempotency_key, "cancel_shipment", db)
     if cached is not None:
         return cached
@@ -317,6 +320,7 @@ def cancel_shipment(
     shipment.status = "cancelled"
 
     db.commit()
+    packet_loss("cancel_shipment")
     db.refresh(shipment)
 
     response_data = ShipmentOut.model_validate(shipment).model_dump()
