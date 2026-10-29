@@ -5,15 +5,12 @@ from typing import Any, cast
 import httpx2
 
 
-
-
-
 async def run_saga() -> None:
 
     await orchestrator(
         generate_idempotency_key(),
-        random.randint(101, 200),
-        random.randint(101, 200)
+        random.randint(1, 100),
+        random.randint(1, 100)
     )
     return
 
@@ -25,17 +22,30 @@ def generate_idempotency_key() -> str:
 async def orchestrator(
         idempotency_key: str,
         product_id: int,
-        quantity: int) -> dict[str, Any]:
+        quantity: int) -> dict[str, Any] | None:
     async with httpx2.AsyncClient(base_url="http://localhost:8000") as client:
-        response = await client.post(
-            "/orders",
-            json={"product_id": product_id, "quantity": quantity,},
+        try:
+            orders = await client.post(
+                "/orders",
+                json={"product_id": product_id, "quantity": quantity,},
+                headers={"Idempotency-key": idempotency_key}
+            )
+            orders.raise_for_status()
+            orders_data = orders.json()
+        except httpx2.HTTPError as e:
+            print(e.response.json()["detail"])
+            return
+
+
+        reservations = await client.post(
+            "/reservations",
+            json={"order_id":orders_data["id"], "quantity": orders_data["quantity"]},
             headers={"Idempotency-key": idempotency_key}
         )
-        data = response.json()
+        reservations_data = reservations.json()
 
         payment = await client.post(
-            f"/payments/{data["reservation_id"]}/pay",
+            f"/payments/{reservations_data["id"]}/pay",
             headers={"Idempotency-key": idempotency_key}
         )
         payment_data = payment.json()
@@ -43,7 +53,7 @@ async def orchestrator(
 
 
         shipment = await client.post(
-            f"/shipping/{payment_data["payment_id"]}/ship",
+            f"/shipping/{payment_data["id"]}/ship",
             headers={"Idempotency-key": idempotency_key}
         )
         shipment_data = shipment.json()

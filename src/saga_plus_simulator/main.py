@@ -1,9 +1,11 @@
+import os
 from typing import Any
 
 from fastapi import Depends, FastAPI, Header, HTTPException
 from sqlalchemy.orm import Session
 
 from saga_plus_simulator.database import get_db
+from saga_plus_simulator.exceptions.fault_injection import inject_connection_loss, inject_delay, packet_loss
 from saga_plus_simulator.generate_idempotency_key import get_cached_response, save_response
 from saga_plus_simulator.models import Order, Payment, Product, Reservation, Shipment
 from saga_plus_simulator.schemas import (
@@ -15,6 +17,7 @@ from saga_plus_simulator.schemas import (
     ShipmentOut,
 )
 
+
 app = FastAPI()
 
 @app.post("/orders", response_model=OrderOut)
@@ -23,6 +26,11 @@ def create_order(
         idempotency_key: str = Header(),
         db: Session = Depends(get_db)
 ) -> Order | dict[str, Any]:
+
+    #inject_delay()
+
+    #inject_connection_loss("create_order")
+
     cached = get_cached_response(idempotency_key, "create_order", db)
     if cached is not None:
         return cached
@@ -34,6 +42,7 @@ def create_order(
 
     db.add(order)
     db.commit()
+    packet_loss("create_order")
     db.refresh(order)
 
     response_data = OrderOut.model_validate(order).model_dump()
