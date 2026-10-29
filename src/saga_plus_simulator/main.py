@@ -104,6 +104,9 @@ def create_reservation(
         idempotency_key: str = Header()
                        ) -> Reservation | dict[str, Any]:
 
+    inject_delay()
+    inject_connection_loss("create_reservation")
+
     cached = get_cached_response(idempotency_key, "create_reservation", db)
     if cached is not None:
         return cached
@@ -114,6 +117,7 @@ def create_reservation(
 
     db.add(reservation)
     db.commit()
+    packet_loss("create_reservation")
     db.refresh(reservation)
 
     response_data = ReservationOut.model_validate(reservation).model_dump()
