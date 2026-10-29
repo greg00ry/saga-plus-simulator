@@ -36,27 +36,38 @@ async def orchestrator(
             print(e.response.json()["detail"])
             return
 
+        try:
+            reservations = await client.post(
+                "/reservations",
+                json={"order_id":orders_data["id"], "quantity": orders_data["quantity"]},
+                headers={"Idempotency-key": idempotency_key}
+            )
+            reservations.raise_for_status()
+            reservations_data = reservations.json()
+        except httpx2.HTTPError as e:
+            print(e.response.json()["detail"])
+            return
 
-        reservations = await client.post(
-            "/reservations",
-            json={"order_id":orders_data["id"], "quantity": orders_data["quantity"]},
-            headers={"Idempotency-key": idempotency_key}
-        )
-        reservations_data = reservations.json()
-
-        payment = await client.post(
-            f"/payments/{reservations_data["id"]}/pay",
-            headers={"Idempotency-key": idempotency_key}
-        )
-        payment_data = payment.json()
+        try:
+            payment = await client.post(
+                f"/payments/{reservations_data["id"]}/pay",
+                headers={"Idempotency-key": idempotency_key}
+            )
+            payment_data = payment.json()
+        except httpx2.HTTPError as e:
+            print(e.response.json()["detail"])
+            return
 
 
-
-        shipment = await client.post(
-            f"/shipping/{payment_data["id"]}/ship",
-            headers={"Idempotency-key": idempotency_key}
-        )
-        shipment_data = shipment.json()
+        try:
+            shipment = await client.post(
+                f"/shipping/{payment_data["id"]}/ship",
+                headers={"Idempotency-key": idempotency_key}
+            )
+            shipment_data = shipment.json()
+        except httpx2.HTTPError as e:
+            print(e.response.json()["detail"])
+            return
 #rozwiązanie problemu zwrócenia Any w mypy, cast wymusza typowanie
         return cast(dict[str, Any], shipment_data)
 
