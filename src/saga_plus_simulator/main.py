@@ -265,6 +265,9 @@ def create_shipping(
         idempotency_key: str = Header()
 ) -> Shipment | dict[str, Any]:
 
+    inject_delay()
+    inject_connection_loss("create_shipping")
+
     cached = get_cached_response(idempotency_key, "create_shipping", db)
     if cached is not None:
         return cached
@@ -281,6 +284,7 @@ def create_shipping(
 
     db.add(shipment)
     db.commit()
+    packet_loss("create_shipping")
     db.refresh(shipment)
 
     response_data = ShipmentOut.model_validate(shipment).model_dump()
