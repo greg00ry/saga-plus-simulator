@@ -178,6 +178,9 @@ def create_payment(
         idempotency_key: str = Header()
 ) -> Payment | dict[str, Any]:
 
+    inject_delay()
+    inject_connection_loss("create_payment")
+
     cached = get_cached_response(idempotency_key, "create_payment", db)
     if cached is not None:
         return cached
@@ -203,6 +206,7 @@ def create_payment(
 
     db.add(payment)
     db.commit()
+    packet_loss("create_payment")
     db.refresh(payment)
 
     response_data = PaymentOut.model_validate(payment).model_dump()
