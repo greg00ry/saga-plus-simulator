@@ -228,6 +228,9 @@ def refund(
         idempotency_key: str = Header()
            ) -> Payment | dict[str, Any]:
 
+    inject_delay()
+    inject_connection_loss("refund_payment")
+
     cached = get_cached_response(idempotency_key, "refund", db)
     if cached is not None:
         return cached
@@ -239,6 +242,7 @@ def refund(
     payment.status = "refund"
 
     db.commit()
+    packet_loss("refund_payment")
     db.refresh(payment)
 
     response_data = PaymentOut.model_validate(payment).model_dump()
