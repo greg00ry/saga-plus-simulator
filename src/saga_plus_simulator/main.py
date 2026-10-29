@@ -1,11 +1,14 @@
-import os
 from typing import Any
 
 from fastapi import Depends, FastAPI, Header, HTTPException
 from sqlalchemy.orm import Session
 
 from saga_plus_simulator.database import get_db
-from saga_plus_simulator.exceptions.fault_injection import inject_connection_loss, inject_delay, packet_loss
+from saga_plus_simulator.exceptions.fault_injection import (
+    inject_connection_loss,
+    inject_delay,
+    packet_loss,
+)
 from saga_plus_simulator.generate_idempotency_key import get_cached_response, save_response
 from saga_plus_simulator.models import Order, Payment, Product, Reservation, Shipment
 from saga_plus_simulator.schemas import (
@@ -16,7 +19,6 @@ from saga_plus_simulator.schemas import (
     ReservationOut,
     ShipmentOut,
 )
-
 
 app = FastAPI()
 
