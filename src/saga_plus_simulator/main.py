@@ -27,9 +27,9 @@ def create_order(
         db: Session = Depends(get_db)
 ) -> Order | dict[str, Any]:
 
-    #inject_delay()
+    inject_delay()
 
-    #inject_connection_loss("create_order")
+    inject_connection_loss("create_order")
 
     cached = get_cached_response(idempotency_key, "create_order", db)
     if cached is not None:
@@ -64,6 +64,10 @@ def release_order(
         idempotency_key: str = Header()
 ) -> Order | dict[str, Any]:
 
+    inject_delay()
+
+    inject_connection_loss("release_order")
+
     cached = get_cached_response(idempotency_key, "release_order", db)
 
     if cached is not None:
@@ -78,6 +82,7 @@ def release_order(
     order.status = "released"
 
     db.commit()
+    packet_loss("release_order")
     db.refresh(order)
 
     response_data = OrderOut.model_validate(order).model_dump()
