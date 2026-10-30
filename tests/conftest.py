@@ -1,15 +1,16 @@
-from dotenv import load_dotenv
-load_dotenv(".env.test", override=True)
+from dotenv import load_dotenv  # noqa: E402
 
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, event
-from sqlalchemy.orm import sessionmaker
-from testcontainers.community.postgres import PostgresContainer
+load_dotenv(".env.test", override=True)# noqa: E402
 
-from saga_plus_simulator import models
-from saga_plus_simulator.database import Base, get_db
-from saga_plus_simulator.main import app
+import pytest  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
+from sqlalchemy import create_engine, event  # noqa: E402
+from sqlalchemy.orm import sessionmaker  # noqa: E402
+from testcontainers.community.postgres import PostgresContainer  # noqa: E402
+
+from saga_plus_simulator import models  # noqa: E402
+from saga_plus_simulator.database import Base, get_db  # noqa: E402
+from saga_plus_simulator.main import app  # noqa: E402
 
 
 @pytest.fixture(scope="session")

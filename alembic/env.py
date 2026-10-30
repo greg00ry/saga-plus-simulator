@@ -4,7 +4,7 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from saga_plus_simulator import models
+from saga_plus_simulator import models  # noqa: F401
 from saga_plus_simulator.database import Base
 
 # this is the Alembic Config object, which provides
